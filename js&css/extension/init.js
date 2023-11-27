@@ -150,7 +150,6 @@ document.addEventListener('it-message-from-youtube', function () {
 		} else if (message.action === 'popup player') {
 			chrome.runtime.sendMessage({
 				action: 'fixPopup',
-				url: message.url,
 				playerSize: {
 					width: message.width,
 					height: message.height

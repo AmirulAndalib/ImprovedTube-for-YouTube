@@ -10,6 +10,8 @@
 # Uninstall URL
 --------------------------------------------------------------*/
 
+
+
 /*--------------------------------------------------------------
 # LOCALE
 --------------------------------------------------------------*/
@@ -263,34 +265,31 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
 		 });
 	} else if (action === 'fixPopup') {
 		//~ get the current focused tab and convert it to a URL-less popup (with same state and size)
+} else  if (action === 'fixPopup') {
+		//no URL-bar
 		chrome.windows.getLastFocused(w => {
-			chrome.tabs.query({
-				windowId: w.id,
-				active: true
-			}, ts => {
-				const tID = ts[0]?.id,
-					data = { type: 'popup' };
-				if (tID) data.tabId = tID;
-				chrome.windows.create(data, pw => {
-					chrome.windows.update(pw.id, {
-						state: w.state,
-						width: message.playerSize.width,
-						height: message.playerSize.height
-					});
-				});
-				//append to title 
-				chrome.tabs.onUpdated.addListener(function listener(tabId, changeInfo) {	 
-				if (tabId === t.id && changeInfo.status === 'complete') {
-				chrome.tabs.executeScript(t.id, {
-				code: `document.title = "${message.title} - ImprovedTube";`
-				});
-				chrome.tabs.onUpdated.removeListener(listener);
-				}  
-			});		
-			});
-		});
-	};
+		chrome.tabs.query({ windowId: w.id, active: true }, ts => {
+		const t = ts[0];
+		const data = { type: "popup"  };
+		if (t) { data.tabId = t.id;  }
+		chrome.windows.create(data, pw => { chrome.windows.update(pw.id, { state: w.state
+		, width: message.playerSize.width, 
+		  height: message.playerSize.height});
+				}); 
+	    //title
+		chrome.tabs.onUpdated.addListener(function listener(tabId, changeInfo) {
+          if (tabId === t.id && changeInfo.status === 'complete') {
+            chrome.tabs.executeScript(t.id, {
+              code: `document.title = "${message.title} - ImprovedTube";`
+            });
+            chrome.tabs.onUpdated.removeListener(listener);
+          }
+        });				
+			});		  
+		  });
+	};	  
 });
+
 
 /*------ search results in new tab --------- 
 chrome.storage.local.get('open_new_tab', function (result) 
